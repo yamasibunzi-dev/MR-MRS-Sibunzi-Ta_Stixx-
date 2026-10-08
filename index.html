@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow"> <!-- asks Google NOT to list this page -->
+<title>Checkers | Mr &amp; Mrs Sibunzi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&amp;family=Great+Vibes&amp;family=Cinzel:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+/* ===== COLOURS (same as the invitation) ===== */
+:root{--red:#b3121f;--dred:#7d0c16;--cream:#f6e9d2;--paper:#fbf3e3;--ink:#2a1511;--gold:#c9a15a;--green:#2e7d32}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{font-family:'Cormorant Garamond',serif;background:var(--cream);color:var(--ink);font-size:20px;min-height:100vh;overflow-x:hidden}
+.script{font-family:'Great Vibes',cursive;color:var(--red)}
+.cin{font-family:'Cinzel',serif;letter-spacing:.12em;text-transform:uppercase}
+.pattern{height:22px;background:repeating-linear-gradient(135deg,var(--red) 0 8px,var(--paper) 8px 12px,var(--ink) 12px 16px,var(--paper) 16px 20px)}
+header{text-align:center;padding:34px 16px 0}
+h1{font-size:clamp(56px,14vw,96px);line-height:1.1}
+h2.t{font-size:clamp(40px,9vw,60px);text-align:center}
+.divider{width:140px;height:2px;margin:10px auto 24px;background:linear-gradient(90deg,transparent,var(--red),transparent);position:relative}
+.divider:after{content:"";position:absolute;left:50%;top:-5px;width:10px;height:10px;background:var(--gold);transform:translateX(-50%) rotate(45deg)}
+main{max-width:1000px;margin:auto;padding:10px 16px 60px}
+.demo{background:#fff3cd;border:2px dashed var(--gold);border-radius:10px;padding:10px 14px;margin:0 auto 20px;max-width:640px;font-size:17px}
+
+/* ===== BUTTONS ===== */
+.btn{font-family:'Cinzel',serif;letter-spacing:.08em;border:2px solid var(--red);background:var(--red);color:var(--cream);padding:9px 18px;border-radius:30px;cursor:pointer;font-size:13px;transition:.25s}
+.btn:hover{background:var(--dred);transform:scale(1.05)}
+.btn.alt{background:transparent;color:var(--red)}
+.btn.alt:hover{background:var(--red);color:var(--cream)}
+.btn.ok{background:var(--green);border-color:var(--green)}
+.btn.ok:hover{background:#1b5e20}
+.btn:disabled{opacity:.5;cursor:wait}
+
+/* ===== LOGIN ===== */
+.card{background:var(--paper);border:2px solid var(--gold);border-radius:16px;padding:26px 20px;box-shadow:0 12px 28px #7d0c1622}
+#login{max-width:420px;margin:0 auto}
+#login label{display:block;margin:12px 0 4px;font-weight:700}
+input,textarea{width:100%;padding:11px;border:2px solid var(--gold);border-radius:8px;font:inherit;background:#fff;outline:none}
+input:focus,textarea:focus{border-color:var(--red)}
+.err{color:var(--red);font-size:16px;min-height:22px;margin-top:8px;text-align:center}
+
+/* ===== LISTS OF PEOPLE ===== */
+.top{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--red);color:var(--cream);border-radius:20px;padding:6px 14px;font-family:'Cinzel';font-size:12px;letter-spacing:.08em}
+.chip.g{background:var(--paper);color:var(--red);border:2px solid var(--gold)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.col h3{font-family:'Cinzel';color:var(--red);letter-spacing:.12em;font-size:16px;padding-bottom:8px;border-bottom:2px solid var(--gold);margin-bottom:10px;display:flex;justify-content:space-between}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--paper);border:1px solid var(--gold);border-radius:12px;padding:10px 12px;margin-bottom:8px;animation:in .5s}
+.row.new{border:2px solid var(--red);box-shadow:0 0 14px #b3121f44}
+.who b{display:block;font-size:20px}
+.who small{font-size:16px}
+.who a{color:var(--red)}
+.acts{display:flex;gap:6px}
+.empty{opacity:.55;text-align:center;padding:12px}
+
+/* ===== UPDATES ===== */
+#upd{margin-top:14px;padding-left:34px}
+#upd li{padding:9px 0;border-bottom:1px dotted var(--gold)}
+.uh{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.uh.click{cursor:pointer}
+.uh.click .un:after{content:" \25BE";color:var(--red)}
+.un{font-weight:700;font-size:20px}
+.um{font-size:16px;opacity:.75;flex-basis:100%;padding-left:30px}
+.ro{font-size:20px;display:inline-block;width:24px}
+.ro.g{filter:hue-rotate(115deg) saturate(1.3)}  /* turns the red rose GREEN */
+.tag{font-family:'Cinzel';font-size:10px;letter-spacing:.1em;padding:2px 8px;border-radius:10px;border:1px solid var(--gold)}
+.tag.accepted{background:#e3f4e4;color:var(--green);border-color:var(--green)}
+.tag.declined,.tag.removed{background:#f1e4de;color:#6b3a2a;border-color:#6b3a2a}
+.why{margin:8px 0 2px 30px;padding:10px 12px;background:#f1e4de;border-left:4px solid #6b3a2a;border-radius:6px;font-size:18px;animation:in .35s}
+.why small{display:block;opacity:.7;margin-top:4px;font-size:15px}
+
+/* ===== POP-UPS ===== */
+.ov{position:fixed;inset:0;background:#2a1511cc;z-index:200;display:none;align-items:center;justify-content:center;padding:14px}
+.ov.on{display:flex}
+.modal{background:var(--paper);border:3px solid var(--gold);border-radius:18px;width:min(94vw,430px);padding:28px 22px;text-align:center;animation:pop .4s cubic-bezier(.2,1.4,.4,1)}
+.modal h3{font-family:'Cinzel';color:var(--red);font-size:19px;line-height:1.4;margin-bottom:14px}
+.modal .row2{display:flex;gap:10px;justify-content:center;margin-top:14px}
+#rmReason{display:none;margin-top:16px;text-align:left;animation:in .4s}
+#rmReason.on{display:block}
+#rmReason label{font-weight:700;display:block;margin-bottom:6px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:var(--ink);color:var(--cream);padding:12px 20px;border-radius:30px;z-index:300;transition:.4s;max-width:90vw;text-align:center;font-size:17px}
+#toast.on{transform:translate(-50%,0)}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+</style>
+</head>
+<body>
+<div class="pattern"></div>
+<header>
+  <h1 class="script">Checkers</h1><div class="divider"></div>
+</header>
+
+<main>
+  <!-- TEST MODE notice (only shows until Firebase is connected in firebase-config.js) -->
+  <div class="demo" id="demo" hidden><b>Test mode.</b> Firebase is not connected yet, so everything stays on this device only. Sign in with any email and the password <b>demo</b>.</div>
+
+  <!-- ===================== LOGIN ===================== -->
+  <div class="card" id="login" hidden>
+    <p style="text-align:center;margin-bottom:6px">Only the family checker can open this page.</p>
+    <label for="em">Email</label><input id="em" type="email" autocomplete="username">
+    <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password">
+    <div class="err" id="lerr"></div>
+    <div style="text-align:center;margin-top:8px"><button class="btn" id="signin">Sign in</button></div>
+  </div>
+
+  <!-- ===================== THE CHECKER ===================== -->
+  <div id="app" hidden>
+    <div class="top">
+      <div class="chips"><span class="chip" id="cPend">0 waiting</span><span class="chip g" id="cAcc">0 accepted</span></div>
+      <button class="btn alt" id="signout">Sign out</button>
+    </div>
+
+    <!-- Everyone who pressed Confirm. New people show first with a red glow. -->
+    <div class="cols">
+      <div class="col"><h3><span>Groom's Side</span><span id="gc"></span></h3><div id="gl"></div></div>
+      <div class="col"><h3><span>Bride's Side</span><span id="bc"></span></h3><div id="bl"></div></div>
+    </div>
+
+    <!-- ===================== UPDATES ===================== -->
+    <div style="height:46px"></div>
+    <h2 class="script t">Updates</h2><div class="divider"></div>
+    <input id="q" type="search" placeholder="Search by name, surname or number">
+    <ol id="upd"></ol>
+  </div>
+</main>
+<div class="pattern"></div>
+
+<!-- POP-UP 1: "Are you sure?" (only for Decline) -->
+<div class="ov" id="mSure"><div class="modal">
+  <h3>Are you sure?</h3>
+  <div class="row2"><button class="btn" id="sureYes">Yes</button><button class="btn alt" id="sureNo">No</button></div>
+</div></div>
+
+<!-- POP-UP 2: "Do you wish to remove this person?" then the reason box -->
+<div class="ov" id="mRm"><div class="modal">
+  <h3>Do you wish to remove this person &#128546;</h3>
+  <p id="rmWho" style="font-weight:700"></p>
+  <div class="row2" id="rmAsk"><button class="btn" id="rmYes">Yes</button><button class="btn alt" id="rmNo">No</button></div>
+  <div id="rmReason">
+    <label for="rmText">Reason?</label>
+    <textarea id="rmText" rows="3" placeholder="Please say why this person is being removed"></textarea>
+    <div class="err" id="rmErr"></div>
+    <div class="row2"><button class="btn" id="rmSubmit">Submit</button><button class="btn alt" id="rmBack">Back</button></div>
+  </div>
+</div></div>
+<div id="toast"></div>
+
+<!-- Firebase libraries + your settings + the engine -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="../firebase-config.js"></script>
+<script src="../store.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const MAX=50;                       /* slots per side - keep the same as index.html */
+let reqs=[],openIds=new Set(),unsub=null,target=null,mode=null;
+
+const fmt=ms=>ms?new Date(ms).toLocaleString('en-ZA',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'-';
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),3200)}
+const on=id=>$(id).classList.add('on'), off=id=>$(id).classList.remove('on');
+
+if(Store.mode==='demo')$('#demo').hidden=false;
+
+/* ---------- login ---------- */
+$('#signin').onclick=async()=>{
+  const b=$('#signin');b.disabled=true;$('#lerr').textContent='';
+  try{await Store.login($('#em').value.trim(),$('#pw').value)}
+  catch(e){$('#lerr').textContent=/too-many/.test(e.code||'')?'Too many tries. Please wait a few minutes.':'Wrong email or password.'}
+  b.disabled=false;
+};
+$('#pw').addEventListener('keydown',e=>e.key==='Enter'&&$('#signin').click());
+$('#signout').onclick=()=>Store.logout();
+Store.onAuth(signedIn=>{
+  $('#login').hidden=signedIn;$('#app').hidden=!signedIn;
+  if(unsub){unsub();unsub=null}
+  if(signedIn)unsub=Store.watchRequests(l=>{reqs=l;render()},e=>toast('Could not load the list ('+(e.code||e.message)+'). Check you signed in with the checker email.'));
+});
+
+/* ---------- drawing the page ---------- */
+function person(r){
+  const pend=r.status==='pending';
+  const tel=r.phone?`<a href="tel:${esc(r.phone.replace(/[^\d+]/g,''))}">${esc(r.phone)}</a>`:'No number given';
+  const btns=pend
+    ?`<button class="btn ok" data-a="accept" data-id="${esc(r.id)}">Accept</button><button class="btn alt" data-a="decline" data-id="${esc(r.id)}">Decline</button>`
+    :`<button class="btn alt" data-a="remove" data-id="${esc(r.id)}">Remove</button>`;
+  return `<div class="row ${pend?'new':''}"><div class="who"><b>${esc(r.name)}</b><small>${tel}</small></div><div class="acts">${btns}</div></div>`;
+}
+function render(){
+  for(const [s,list,count] of [['groom','#gl','#gc'],['bride','#bl','#bc']]){
+    const act=reqs.filter(r=>r.side===s&&(r.status==='pending'||r.status==='accepted'));
+    const pend=act.filter(r=>r.status==='pending').sort((a,b)=>b.created-a.created);   /* newest waiting person on top */
+    const acc=act.filter(r=>r.status==='accepted');
+    $(list).innerHTML=pend.concat(acc).map(person).join('')||'<p class="empty">No one yet</p>';
+    $(count).textContent=acc.length+' / '+MAX;
+  }
+  $('#cPend').textContent=reqs.filter(r=>r.status==='pending').length+' waiting';
+  $('#cAcc').textContent=reqs.filter(r=>r.status==='accepted').length+' accepted';
+
+  /* Updates list: green rose = accepted, decaying rose = declined/removed, hourglass = still waiting */
+  const q=$('#q').value.trim().toLowerCase();
+  const all=reqs.filter(r=>!q||(r.name+' '+(r.phone||'')).toLowerCase().includes(q));
+  $('#upd').innerHTML=all.map(r=>{
+    const dead=r.status==='declined'||r.status==='removed';
+    const ic=r.status==='accepted'?'<span class="ro g">&#127801;</span>':dead?'<span class="ro">&#129344;</span>':'<span class="ro">&#9203;</span>';
+    const label={pending:'Waiting',accepted:'Accepted',declined:'Declined',removed:'Removed'}[r.status]||r.status;
+    const why=dead&&openIds.has(r.id)?`<div class="why"><b>${label}. Reason:</b> ${esc(r.reason||'-')}<small>${fmt(r.decided)}</small></div>`:'';
+    return `<li><div class="uh ${dead?'click':''}" data-id="${esc(r.id)}">${ic}<span class="un">${esc(r.name)}</span><span class="tag ${esc(r.status)}">${label}</span><span class="um">${esc(r.phone||'No number')} &middot; ${fmt(r.created)}</span></div>${why}</li>`;
+  }).join('')||'<li class="empty" style="list-style:none">Nothing to show</li>';
+}
+$('#q').addEventListener('input',render);
+$('#upd').addEventListener('click',e=>{            /* click a name = show / hide the reason */
+  const h=e.target.closest('.uh.click');if(!h)return;
+  const id=h.dataset.id;openIds.has(id)?openIds.delete(id):openIds.add(id);render();
+});
+
+/* ---------- buttons on each person ---------- */
+function buttons(e){
+  const b=e.target.closest('button[data-a]');if(!b)return;
+  const r=reqs.find(x=>x.id===b.dataset.id);if(!r)return;
+  target=r;
+  if(b.dataset.a==='accept'){
+    const n=reqs.filter(x=>x.side===r.side&&x.status==='accepted').length;
+    if(n>=MAX)return toast((r.side==='groom'?"Groom's":"Bride's")+' side is full ('+MAX+')');
+    b.disabled=true;
+    Store.accept(r).then(()=>toast(r.name+' accepted')).catch(err=>{b.disabled=false;toast('Could not accept ('+(err.code||err.message)+')')});
+  }
+  if(b.dataset.a==='decline'){mode='declined';on('#mSure')}        /* Are you sure? */
+  if(b.dataset.a==='remove'){mode='removed';openRemove()}          /* straight to the "Do you wish to remove" pop-up */
+}
+$('#gl').addEventListener('click',buttons);$('#bl').addEventListener('click',buttons);
+
+/* ---------- pop-ups ---------- */
+$('#sureNo').onclick=()=>off('#mSure');
+$('#sureYes').onclick=()=>{off('#mSure');openRemove()};
+function openRemove(){
+  $('#rmWho').textContent=target?target.name:'';
+  $('#rmAsk').style.display='flex';$('#rmReason').classList.remove('on');
+  $('#rmText').value='';$('#rmErr').textContent='';on('#mRm');
+}
+$('#rmNo').onclick=()=>off('#mRm');
+$('#rmYes').onclick=()=>{$('#rmAsk').style.display='none';$('#rmReason').classList.add('on');$('#rmText').focus()};
+$('#rmBack').onclick=()=>off('#mRm');
+$('#rmSubmit').onclick=async()=>{
+  const reason=$('#rmText').value.trim();
+  if(!reason)return $('#rmErr').textContent='A reason is required.';
+  const b=$('#rmSubmit');b.disabled=true;
+  try{await Store.remove(target,mode,reason);off('#mSure');off('#mRm');toast(target.name+' removed')}
+  catch(e){$('#rmErr').textContent='Could not save ('+(e.code||e.message)+')'}
+  b.disabled=false;
+};
+</script>
+</body>
+</html>
