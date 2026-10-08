@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcoming of Umakoti | Mr &amp; Mrs Sibunzi</title>
+<!-- ==========================================================================
+     WHATSAPP PREVIEW CARD - the picture + title people see when you send the link.
+     AFTER you get your link (e.g. https://sibunzi-umakoti.netlify.app), replace
+     https://YOUR-LINK-HERE with it in the og:image and og:url lines below.
+     Keep the /pic1.jpg on the end of the og:image line.
+     ========================================================================== -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="You are invited: Welcoming of Umakoti">
+<meta property="og:description" content="Mr &amp; Mrs Sibunzi - 28th November, Brookville (West Bank). Tap to open your invitation.">
+<meta property="og:image" content="https://YOUR-LINK-HERE/pic1.jpg">
+<meta property="og:url" content="https://YOUR-LINK-HERE">
+<meta name="twitter:card" content="summary_large_image">
+<!-- Fonts (needs internet): Great Vibes = the curly script, Cinzel = small capitals, Cormorant = body text -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&amp;family=Great+Vibes&amp;family=Cinzel:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   PART 1 - YOUR PICTURES AND COLOURS  (the most useful part to edit!)
+   ==========================================================================
+   All pictures live in the SAME folder as this index.html.
+
+   >>> HOW TO CHANGE A PICTURE (example):
+       You want a different photo at the very top?
+       1. Copy the new photo into the folder, e.g. "honeymoon.jpg"
+       2. Change  --top-photo:url("pic1.jpg");  to  --top-photo:url("honeymoon.jpg");
+       3. Save in Notepad++ (Ctrl+S) and refresh the browser (F5). Done!
+
+   >>> HOW TO ADD A PICTURE TO THE SLIDING ROW:
+       Search for  EDIT: PHOTOS  further down (JavaScript part) - it is just a list of file names.
+   -------------------------------------------------------------------------- */
+:root{
+  --top-photo:url("pic1.jpg");     /* BIG photo at the very top of the invitation */
+  --fan-left:url("pic3.jpg");      /* overlapping group: LEFT photo (tilted left)  */
+  --fan-mid:url("pic7.jpg");       /* overlapping group: MIDDLE photo (in front)   */
+  --fan-right:url("pic6.jpg");     /* overlapping group: RIGHT photo (tilted right)*/
+
+  /* Colours taken from your uncle's poster. Change the # codes to recolour everything */
+  --red:#b3121f; --dred:#7d0c16; --cream:#f6e9d2; --paper:#fbf3e3; --ink:#2a1511; --gold:#c9a15a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Cormorant Garamond',serif;background:var(--cream);color:var(--ink);overflow-x:hidden;font-size:20px}
+body.lock{overflow:hidden;height:100vh}               /* page can't scroll until envelope is opened */
+.script{font-family:'Great Vibes',cursive;color:var(--red)}
+.cin{font-family:'Cinzel',serif;letter-spacing:.2em;text-transform:uppercase}
+.pattern{height:22px;background:repeating-linear-gradient(135deg,var(--red) 0 8px,var(--paper) 8px 12px,var(--ink) 12px 16px,var(--paper) 16px 20px)} /* the red/black Swati stripe */
+
+/* ROSE CORNERS - 4 separate rose pictures, one stuck to each corner of the SCREEN.
+   They stay in their corner while the page scrolls underneath, and sit ON TOP of the content.
+   SIZE: change clamp(90px,18vw,230px)  = (smallest, relative to screen width, biggest)
+   They give a tiny "nudge" when you scroll (see NUDGE in the JavaScript) */
+.rose{position:fixed;z-index:45;width:clamp(90px,18vw,230px);height:auto;pointer-events:none;opacity:0;transition:opacity 1.6s 1.2s;filter:drop-shadow(0 4px 8px #0003);transform:translateY(var(--nv,0px))}
+body:not(.lock) .rose{opacity:1}
+.rose.tl{left:0;top:0}
+.rose.tr{right:0;top:0}
+.rose.bl{left:0;bottom:0}
+.rose.br{right:0;bottom:0}
+/* ==========================================================================
+   PART 2 - THE ENVELOPE INTRO
+   ========================================================================== */
+#intro{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 40%,#9a1220,#4a0910 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;transition:transform 1.2s cubic-bezier(.7,0,.2,1),opacity 1s;color:var(--cream);text-align:center;padding:20px;overflow:hidden}
+#intro.go{transform:scale(2.6);opacity:0;pointer-events:none}   /* the "zoom open" when tapped */
+#intro h2{font-size:clamp(36px,9vw,60px);color:var(--cream);text-shadow:0 3px 14px #0008}
+#intro p{letter-spacing:.2em;animation:pulse 1.8s infinite;color:var(--gold)}
+.spark{position:absolute;width:6px;height:6px;background:var(--gold);transform:rotate(45deg);opacity:0;animation:twinkle 3s infinite}  /* little gold sparkles (made by JS) */
+
+.env{position:relative;width:min(80vw,340px);height:min(54vw,230px);cursor:pointer;animation:float 3.2s ease-in-out infinite;perspective:900px}
+.env.open{animation:none}
+.env .back{position:absolute;inset:0;border-radius:8px;background:linear-gradient(145deg,#8f0f1a,#5a0a12);border:2px solid var(--gold);box-shadow:0 26px 44px #000b,0 0 60px #c9a15a33}  /* red inside lining */
+.letter{position:absolute;left:7%;right:7%;top:7%;height:86%;background:var(--paper);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;transition:transform .9s .5s;z-index:2;box-shadow:0 0 0 3px var(--gold) inset,0 0 0 7px var(--paper) inset,0 0 0 8px var(--red) inset}
+.env.open .letter{transform:translateY(-72%)}                    /* letter slides up */
+.pk{position:absolute;inset:0;z-index:3;border-radius:8px}        /* the 3 front folds of the envelope */
+.pk.l{clip-path:polygon(0 0,52% 57%,0 100%);background:linear-gradient(90deg,#e8d0a0,#d3b479)}
+.pk.r{clip-path:polygon(100% 0,48% 57%,100% 100%);background:linear-gradient(270deg,#e8d0a0,#d3b479)}
+.pk.b{clip-path:polygon(0 100%,50% 43%,100% 100%);background:linear-gradient(0deg,#d9bc84,#efdcb2)}
+.flap{position:absolute;left:0;right:0;top:0;height:60%;background:linear-gradient(#ecd8a8,#c9a96b);clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .7s,z-index 0s .35s;z-index:4}
+.env.open .flap{transform:rotateX(180deg);z-index:1}                /* flap opens */
+.seal{position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e8404c,var(--dred));z-index:5;display:flex;align-items:center;justify-content:center;color:var(--cream);font-family:'Great Vibes';font-size:34px;box-shadow:0 5px 12px #0008,0 0 0 4px #7d0c16 inset,0 0 0 6px #c9a15a88 inset;transition:opacity .3s}
+.seal:after{content:"";position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--gold);opacity:0;animation:ring 2s infinite}  /* ripple around the seal */
+.env.open .seal{opacity:0}
+.env:hover .seal{animation:beat .8s infinite}
+
+/* ==========================================================================
+   PART 3 - HERO (top photo), COUNTDOWN, DETAILS
+   ========================================================================== */
+main{opacity:0;transition:opacity 1s .4s}
+main.show{opacity:1}
+section{padding:70px 20px;max-width:900px;margin:auto;text-align:center}
+.hero{padding-top:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:radial-gradient(circle at 50% 30%,var(--paper),var(--cream));max-width:none;position:relative}
+/* The big top photo. Change height with 78vh (vh = % of screen height). Use  center 22%  to move which part of the photo shows */
+.frame{position:relative;overflow:hidden;width:100%;height:78vh;min-height:430px;max-height:760px;background:#d9c19a;-webkit-mask-image:linear-gradient(#000 68%,transparent);mask-image:linear-gradient(#000 68%,transparent)}
+.frame:before{content:"";position:absolute;inset:0;background:var(--top-photo) center 22%/cover no-repeat;animation:kb 18s ease-in-out infinite alternate}  /* "center 22%" = which part of the photo shows. Try 10% (higher) or 40% (lower) */
+.hero h1{font-family:'Cinzel';font-size:clamp(18px,4vw,26px);letter-spacing:.3em}
+.hero .big{font-size:clamp(72px,18vw,140px);line-height:1;color:var(--red);margin-top:38px}  /* margin-top = space between "Welcoming of" and "Umakoti". Make bigger for more space */
+.clans{font-size:clamp(18px,4vw,26px);font-weight:700;margin-top:10px}
+/* WELCOME MESSAGE card (above "Scroll"). Change padding/max-width to resize it */
+.welcome{position:relative;max-width:640px;margin:34px 18px 0;padding:34px 26px 30px;background:var(--paper);border:2px solid var(--gold);border-radius:18px;box-shadow:0 14px 34px #7d0c1626;text-align:center}
+.welcome:before{content:"";position:absolute;inset:7px;border:1px dashed var(--gold);border-radius:12px;pointer-events:none}
+.welcome .orn{display:block;color:var(--gold);font-size:18px;letter-spacing:.6em;margin-bottom:10px}
+.welcome .orn b{color:var(--red);display:inline-block;animation:beat2 1.6s infinite}
+.welcome p{font-size:clamp(19px,3.6vw,23px);line-height:1.6}
+.welcome .lead{font-family:'Great Vibes',cursive;color:var(--red);font-size:clamp(28px,6vw,38px);line-height:1.25;margin-bottom:12px}
+.welcome em{color:var(--red);font-weight:700;font-style:italic}
+@keyframes beat2{50%{transform:scale(1.35)}}
+.scroll{margin-top:28px;color:var(--red);animation:bounce 1.6s infinite;font-size:14px}
+.petal{position:fixed;top:-30px;width:14px;height:18px;background:var(--red);border-radius:80% 0 80% 0;opacity:.7;z-index:50;pointer-events:none;animation:fall linear forwards}  /* falling petals */
+h2.t{font-size:clamp(40px,9vw,64px);margin-bottom:10px}
+.divider{width:140px;height:2px;margin:12px auto 30px;background:linear-gradient(90deg,transparent,var(--red),transparent);position:relative}
+.divider:after{content:"";position:absolute;left:50%;top:-5px;width:10px;height:10px;background:var(--gold);transform:translateX(-50%) rotate(45deg)}
+.count{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.count div{background:var(--red);color:var(--cream);width:76px;padding:14px 0;border-radius:10px;font-size:13px;letter-spacing:.1em;box-shadow:0 6px 14px #7d0c1655}
+.count b{display:block;font-size:30px;font-family:'Cinzel'}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px}
+.card{background:var(--paper);border:2px solid var(--gold);border-radius:14px;padding:28px 18px;transition:transform .4s,box-shadow .4s}
+.card:hover{transform:translateY(-8px);box-shadow:0 16px 30px #7d0c1633}
+.card .ic{font-size:38px;display:block;margin-bottom:8px}
+.card h3{font-family:'Cinzel';letter-spacing:.15em;color:var(--red);font-size:16px;margin-bottom:8px}
+.btn{display:inline-block;font-family:'Cinzel';letter-spacing:.12em;border:none;background:var(--red);color:var(--cream);padding:14px 28px;border-radius:40px;cursor:pointer;font-size:15px;text-decoration:none;transition:.3s;box-shadow:0 6px 16px #7d0c1666}
+.btn:hover{background:var(--dred);transform:scale(1.06)}
+.btn.alt{background:transparent;color:var(--red);border:2px solid var(--red);box-shadow:none}
+.btn.alt:hover{background:var(--red);color:var(--cream)}
+.btn.sm{padding:9px 18px;font-size:13px;margin-top:14px}
+
+/* ==========================================================================
+   PART 4 - OUR MOMENTS (sliding pictures + overlapping group)
+   ========================================================================== */
+.car{display:flex;gap:16px;overflow-x:auto;padding:14px 4px 20px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.car::-webkit-scrollbar{display:none}
+.car div{flex:0 0 min(62vw,250px);aspect-ratio:3/4;border-radius:12px;border:4px solid var(--paper);box-shadow:0 8px 20px #0003;background:#d9c19a center/cover}
+/* the 3 overlapping photos. Tilt = rotate(25deg). Overlap = the "left:" and "width:" numbers */
+.fan{position:relative;width:min(92vw,520px);height:min(70vw,360px);margin:36px auto 0}
+.fan .f{position:absolute;border:4px solid var(--paper);border-radius:10px;box-shadow:0 10px 24px #0004;background:#d9c19a center/cover;transition:transform .6s}
+.fan .m{left:28%;width:44%;top:0;height:100%;z-index:2;background-image:var(--fan-mid)}                         /* middle, in front */
+.fan .l{left:10%;width:40%;top:14%;height:78%;transform:rotate(-25deg);background-image:var(--fan-left)}         /* left, tilted left */
+.fan .r{left:50%;width:40%;top:14%;height:78%;transform:rotate(25deg);background-image:var(--fan-right)}          /* right, tilted right */
+.fan:hover .l{transform:rotate(-32deg) translateX(-10px)}
+.fan:hover .r{transform:rotate(32deg) translateX(10px)}
+
+/* ==========================================================================
+   PART 5 - MUSIC PLAYER
+   ========================================================================== */
+.player{max-width:520px;margin:auto}
+.wave{display:flex;align-items:center;justify-content:center;gap:4px;height:90px}
+.wave i{display:block;width:5px;border-radius:5px;background:#9a8570;transition:background .3s}   /* not yet played */
+.wave i.done{background:var(--red)}                                                              /* already played */
+.player.playing .wave i{animation:eq 1s ease-in-out infinite alternate}
+#seek{width:100%;margin:18px 0 6px;accent-color:var(--red);cursor:pointer}
+.ctl{display:flex;align-items:center;justify-content:center;gap:34px;margin-top:8px}
+.ctl button{background:none;border:none;cursor:pointer;color:var(--red);transition:.3s}
+.ctl button:hover{transform:scale(1.15)}
+.ctl svg{width:38px;height:30px;fill:currentColor}
+.ctl .pp{width:72px;height:72px;border-radius:50%;background:var(--red);color:var(--cream);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px #7d0c1666}
+.ctl .pp svg{width:30px;height:30px}
+.lbl{margin-top:16px;color:var(--red);font-size:14px}
+.plist{margin-top:18px;text-align:left}
+.plist p{padding:10px 14px;border-bottom:1px dotted var(--gold);cursor:pointer;transition:.3s;font-size:19px}
+.plist p:hover{background:#c9a15a22}
+.plist p.on{color:var(--red);font-weight:700}
+.plist p.on:before{content:"\266A  "}
+
+/* ==========================================================================
+   PART 6 - RSVP, QUOTES, FOOTER
+   ========================================================================== */
+.rsvp{background:linear-gradient(var(--paper),var(--cream));border-radius:20px;margin:0 auto;border:2px solid var(--gold)}
+.quote{min-height:140px;display:flex;align-items:center;justify-content:center}
+#qt{font-size:clamp(24px,5vw,34px);font-style:italic;max-width:640px;opacity:0;transition:opacity 1.4s;line-height:1.35}
+#qt.on{opacity:1}
+footer{background:var(--dred);color:var(--cream);padding:30px 20px;text-align:center}
+footer a{color:var(--gold)}
+.rv{opacity:0;transform:translateY(40px);transition:1s}   /* "rv" = fades up when you scroll to it */
+.rv.in{opacity:1;transform:none}
+
+/* ==========================================================================
+   PART 7 - POP-UPS (RSVP + attendees list)
+   ========================================================================== */
+.ov{position:fixed;inset:0;background:#2a1511cc;z-index:200;display:none;align-items:center;justify-content:center;padding:14px}
+.ov.on{display:flex}
+.modal{background:var(--paper);border:3px solid var(--gold);border-radius:18px;width:min(94vw,480px);max-height:90vh;overflow-y:auto;padding:28px 22px;text-align:center;animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+.modal h3{font-family:'Cinzel';color:var(--red);font-size:19px;line-height:1.4;margin-bottom:16px}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+#more{display:none;text-align:left;margin-top:18px;border-top:1px dashed var(--gold);padding-top:16px}
+#more.on{display:block;animation:fade .6s}
+.sides{display:flex;gap:12px}
+.side{flex:1;border:2px solid var(--gold);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer;transition:.3s;background:#fff8}
+.side.sel{background:var(--red);color:var(--cream);transform:scale(1.04);box-shadow:0 6px 14px #7d0c1666}
+.side small{display:none;font-size:15px;margin-top:4px}
+.side.sel small{display:block}
+.side b{font-family:'Cinzel';font-size:14px;letter-spacing:.08em}
+.side .n{font-size:34px;font-weight:700;display:block}
+#more label{display:block;margin:14px 0 4px;font-weight:700}
+#more input{width:100%;padding:11px;border:2px solid var(--gold);border-radius:8px;font:inherit;background:#fff;outline:none}
+#more input:focus{border-color:var(--red)}
+.hint{color:var(--red);font-weight:700;display:inline-block;animation:nudge 1.6s infinite}
+@keyframes nudge{50%{transform:translateX(5px)}}
+.err{color:var(--red);font-size:16px;min-height:22px;margin-top:8px;text-align:center}
+.prog{margin-top:20px;cursor:pointer;text-align:center}
+.bar{height:16px;background:#e8d5ae;border-radius:10px;overflow:hidden;margin-top:6px;border:1px solid var(--gold)}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--dred),#e0303c);transition:width 1s}
+.prog span{font-family:'Cinzel';font-size:14px;letter-spacing:.15em}
+.lists{display:flex;gap:10px}
+.lists>div{flex:1}
+.lists h4{font-family:'Cinzel';color:var(--red);font-size:15px;padding-bottom:6px;border-bottom:2px solid var(--gold)}
+.scr{max-height:300px;overflow-y:auto;margin:8px 0;text-align:left}
+.scr p{padding:6px 4px;border-bottom:1px dotted var(--gold);font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scr p.taken{color:var(--red);font-weight:700}
+.scr p em{opacity:.4;font-style:normal}
+
+/* ANIMATIONS (names are used above) */
+@keyframes float{50%{transform:translateY(-12px)}}
+@keyframes pulse{50%{opacity:.35}}
+@keyframes beat{50%{transform:translate(-50%,-50%) scale(1.15)}}
+@keyframes ring{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.5);opacity:0}}
+@keyframes twinkle{0%,100%{opacity:0;transform:rotate(45deg) scale(.4)}50%{opacity:.9;transform:rotate(45deg) scale(1.4)}}
+@keyframes bounce{50%{transform:translateY(10px)}}
+@keyframes fall{to{transform:translateY(110vh) rotate(500deg)}}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+@keyframes fade{from{opacity:0;transform:translateY(-10px)}}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.1)}}
+@keyframes eq{from{transform:scaleY(.45)}to{transform:scaleY(1.1)}}
+</style>
+</head>
+<body class="lock">
+<!-- ROSE CORNERS: one picture per corner, each stuck to its corner of the screen.
+     To use a different rose picture, put it in the folder and change the file name in src="..." -->
+<img class="rose tl" src="rose-top-left.png" alt="">
+<img class="rose tr" src="rose-top-right.png" alt="">
+<img class="rose bl" src="rose-bottom-left.png" alt="">
+<img class="rose br" src="rose-bottom-right.png" alt="">
+
+<!-- ==========================================================================
+     SECTION 1 - ENVELOPE (first thing guests see). Tapping it opens the invitation
+     To change the words: edit "You are invited", "Umakoti", "Mr & Mrs Sibunzi", or the letter "S" on the seal
+     ========================================================================== -->
+<div id="intro">
+  <h2 class="script">You are invited</h2>
+  <div class="env" id="env">
+    <div class="back"></div>
+    <div class="letter"><span class="script" style="font-size:38px">Umakoti</span><small class="cin" style="font-size:10px;color:var(--ink)">Mr &amp; Mrs Sibunzi</small></div>
+    <div class="pk l"></div><div class="pk r"></div><div class="pk b"></div>
+    <div class="flap"></div>
+    <div class="seal">S</div>
+  </div>
+  <p class="cin" style="font-size:13px">Tap the envelope to open</p>
+</div>
+
+<main id="main">
+  <div class="pattern"></div>
+
+  <!-- ======================================================================
+       SECTION 2 - TOP OF THE INVITATION (big photo + title)
+       The big photo is set in PART 1 of the CSS (--top-photo)
+       ====================================================================== -->
+  <section class="hero">
+    <div class="frame"></div>
+    <div class="rv" style="margin-top:-60px;position:relative"><h1>Welcoming of</h1></div>
+    <div class="script big rv">Umakoti</div>
+    <div class="clans rv">wo Mfene, ooHlathi, ooLisa, ooJambase</div>   <!-- clan names: edit here -->
+    <!-- WELCOME MESSAGE: edit the words between the <p> tags -->
+    <div class="welcome rv">
+      <span class="orn">&#10087; <b>&#10084;</b> &#10087;</span>
+      <p class="lead">This year we celebrate the beautiful union of Mr. and Mrs. Sibunzi as they embark on their journey of love and togetherness!</p>
+      <p>We warmly invite you to join us in honouring their special day, sharing in our joy, and raising a glass to a <em>lifetime of happiness, laughter, and unforgettable memories.</em></p>
+      <p style="margin-top:10px">Please find all the details for the celebration below.</p>
+    </div>
+    <div class="scroll cin">Scroll &#8595;</div>
+  </section>
+
+  <!-- SECTION 3 - COUNTDOWN (the date is set in the JavaScript, search "EDIT: DATE") -->
+  <section class="rv">
+    <h2 class="script t">Save the Date</h2><div class="divider"></div>
+    <div class="count" id="count"></div>
+  </section>
+
+  <!-- ======================================================================
+       SECTION 4 - THE DETAILS (date / venue / gifts cards)
+       To add a time: copy one <div class="card">...</div> block and change the words
+       ====================================================================== -->
+  <section>
+    <h2 class="script t rv">The Details</h2><div class="divider"></div>
+    <div class="cards rv">
+      <div class="card"><span class="ic">&#128197;</span><h3>Date</h3><p>28th November</p></div>
+      <div class="card"><span class="ic">&#128205;</span><h3>Venue</h3><p>13 De Wet Street,<br>Brookville (West Bank)</p>
+        <!-- "View Map" button opens Google Maps with the address typed after query= -->
+        <a class="btn alt sm" target="_blank" href="https://www.google.com/maps/search/?api=1&amp;query=13+De+Wet+Street+Brookville+West+Bank">View Map</a></div>
+      <div class="card"><span class="ic">&#127873;</span><h3>Gifts</h3><p>Gifts are welcome</p></div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       SECTION 5 - OUR MOMENTS
+       The sliding row is filled by JavaScript (search "EDIT: CAROUSEL")
+       The overlapping group (.fan) uses --fan-left, --fan-mid, --fan-right from PART 1
+       ====================================================================== -->
+  <section>
+    <h2 class="script t rv">Our Moments</h2><div class="divider"></div>
+    <div class="car" id="car"></div>
+    <p class="cin" style="font-size:11px;margin-top:10px;opacity:.6">Swipe to explore</p>
+    <div class="fan rv"><div class="f l"></div><div class="f r"></div><div class="f m"></div></div>
+  </section>
+
+  <!-- ======================================================================
+       SECTION 6 - MUSIC PLAYLIST
+       HOW TO ADD YOUR SONGS: see "EDIT: SONGS" in the JavaScript at the bottom
+       ====================================================================== -->
+  <section class="rv">
+    <h2 class="script t">Our Playlist</h2><div class="divider"></div>
+    <div class="player" id="player">
+      <div class="wave" id="wave"></div>
+      <input type="range" id="seek" min="0" max="100" value="0">
+      <div class="ctl">
+        <button id="prev" aria-label="Previous song"><svg viewBox="0 0 40 30"><path d="M18 2v26L2 15zM38 2v26L22 15z"/></svg></button>
+        <button id="pp" class="pp" aria-label="Play or pause"></button>
+        <button id="next" aria-label="Next song"><svg viewBox="0 0 40 30"><path d="M22 2v26l16-13zM2 2v26l16-13z"/></svg></button>
+      </div>
+      <div class="lbl cin" id="lbl">Click to play</div>
+      <div class="plist" id="plist"></div>
+      <audio id="aud" preload="none"></audio>
+    </div>
+  </section>
+
+  <!-- SECTION 7 - RSVP BUTTON + ATTENDEES BAR (the pop-ups are further down the page) -->
+  <section class="rsvp rv">
+    <h2 class="script t">Will you be there?</h2><div class="divider"></div>
+    <p style="margin-bottom:22px">Please inform us you will be coming</p>
+    <button class="btn" id="openRsvp">&#10084; Count Me In</button>
+    <div class="prog" id="prog2"><span>Attendees</span><div class="bar"><i></i></div><small class="cnt"></small></div>
+  </section>
+
+  <!-- SECTION 8 - RSVP PHONE NUMBERS (change the numbers in BOTH the tel: link and the shown text) -->
+  <section class="rv">
+    <h2 class="script t">RSVP</h2><div class="divider"></div>
+    <p style="margin-bottom:10px">If you have changes made please contact:</p>
+    <p>Milisa &nbsp;<a href="tel:0713470807">071 347 0807</a><br>Ntlentle &nbsp;<a href="tel:0664370918">066 437 0918</a></p>
+  </section>
+
+  <!-- SECTION 9 - FADING QUOTES (the 15 quotes are in the JavaScript, search "EDIT: QUOTES") -->
+  <section class="rv">
+    <h2 class="script t">Words of Love</h2><div class="divider"></div>
+    <div class="quote"><p id="qt"></p></div>
+  </section>
+
+  <!-- SECTION 10 - FOOTER -->
+  <footer><span class="script" style="font-size:36px;color:var(--cream)">Becoming Mrs S</span><br>With love, the Sibunzi family</footer>
+  <div class="pattern"></div>
+</main>
+
+<!-- POP-UP 1: RSVP (Yes / Back, then side, name, email, progress, Confirm / Back) -->
+<div class="ov" id="m1"><div class="modal">
+  <div id="ask">
+    <h3>Will you be joining us on this special day?</h3>
+    <div class="row"><button class="btn" id="yes">Yes</button><button class="btn alt" id="back1">Back</button></div>
+  </div>
+  <div id="more">
+    <label style="margin-top:0">1. Which side are you from?</label>
+    <div class="sides">
+      <div class="side" data-s="groom"><b>Groom's Side</b><small>Slots available</small><span class="n" id="gl" style="display:none">50</span></div>
+      <div class="side" data-s="bride"><b>Bride's Side</b><small>Slots available</small><span class="n" id="bl" style="display:none">50</span></div>
+    </div>
+    <label>2. Name and Surname</label><input id="nm" placeholder="e.g. Thabo Dlamini">
+    <label>Phone number <small>(optional)</small></label><input id="ph" type="tel" inputmode="tel" placeholder="e.g. 071 234 5678">
+    <div class="prog" id="prog1"><span>Attendees</span><div class="bar"><i></i></div><small class="cnt"></small></div>
+    <div class="err" id="err"></div>
+    <div class="row"><button class="btn" id="confirm">Confirm</button><button class="btn alt" id="back2">Back</button></div>
+  </div>
+</div></div>
+
+<!-- POP-UP 2: ATTENDEES LIST (Groom on the left, Bride on the right, numbered 1-50) -->
+<div class="ov" id="m2"><div class="modal">
+  <h3>Attendees</h3>
+  <div class="lists">
+    <div><h4>Groom</h4><div class="scr" id="lg"></div></div>
+    <div><h4>Bride</h4><div class="scr" id="lb"></div></div>
+  </div>
+  <div class="row"><button class="btn alt" id="back3">Back</button></div>
+</div></div>
+
+<!-- Online database (Firebase) - see firebase-config.js and store.js -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="store.js"></script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+
+/* ==========================================================================
+   EDIT: SONGS  - your playlist
+   1. Make a folder called  songs  next to this index.html
+   2. Put your .mp3 files inside it (e.g. songs/first-dance.mp3)
+   3. Add one line per song below:  {title:"What guests see", src:"songs/file-name.mp3"},
+   Keep the comma at the end of each line. The first song also starts when
+   the envelope is tapped. Delete the sample lines you don't need.
+   ========================================================================== */
+const SONGS=[
+  {title:"Song 1 - add your title", src:"songs/song1.mp3"},
+  {title:"Song 2 - add your title", src:"songs/song2.mp3"},
+  {title:"Song 3 - add your title", src:"songs/song3.mp3"}
+];
+
+/* ==========================================================================
+   EDIT: DATE  - the countdown. Format: year-month-day (T00:00:00 = midnight)
+   ========================================================================== */
+const target=new Date('2026-11-28T00:00:00');
+
+/* ==========================================================================
+   EDIT: PHOTOS - the sliding pictures in "Our Moments"
+   It is just a list of file names. The files must be in the SAME folder as index.html.
+
+   HOW TO ADD A PICTURE (example):
+     1. Copy "wedding-day.jpg" into the folder
+     2. Add a new line below, before the ]:      "wedding-day.jpg",
+        (keep the quote marks " " and the comma at the end)
+   HOW TO REMOVE A PICTURE: delete its line, or put // at the start of the line.
+   HOW TO CHANGE THE ORDER: move the lines up or down.
+   ========================================================================== */
+const PHOTOS=[
+  "pic1.jpg",
+  "pic2.jpg",
+  "pic3.jpg",
+  "pic4.jpg",
+  "pic5.jpg",
+  "pic6.jpg",
+  "pic7.jpg",
+  "pic8.jpg",
+  "pic9.jpg",
+  "pic10.jpg",
+  "pic11.jpg",
+  "pic12.jpg",
+  // "pic13.jpg",   <- switched off: it has a video timestamp on it and is low quality. Remove the // to show it.
+  "pic14.jpg"
+];
+/* NUDGE: how far (in pixels) the roses wobble when scrolling. Set to 0 to keep them perfectly still */
+const NUDGE=8;
+const SLIDE_SPEED=.6;   /* bigger number = faster sliding, smaller = slower */
+
+/* ==========================================================================
+   EDIT: QUOTES - the 15 fading quotes. Change the words between the " marks
+   ========================================================================== */
+const Q=["Two hearts, one home, a lifetime of love.",
+"Love is not found; it is built, day by day, together.",
+"Today a family grows, and so does our joy.",
+"May your love be the roof that shelters all who come after you.",
+"Every great love story begins with a quiet yes.",
+"Together is our favourite place to be.",
+"A good marriage is two people choosing each other, again and again.",
+"May your days be sweet and your laughter always louder than your worries.",
+"Love makes a house a home, and a home a blessing.",
+"To walk beside you through every season is my greatest gift.",
+"Your love is a song the whole family gets to sing.",
+"With family beside you, there is no road too long.",
+"May God keep your hands joined and your hearts open.",
+"Love grows where kindness is planted.",
+"Welcome home, Umakoti. Our family is brighter with you."];
+
+/* ---------- Everything below is the "engine". You normally don't need to touch it ---------- */
+
+/* sparkles on the envelope screen */
+for(let i=0;i<18;i++){const s=document.createElement('span');s.className='spark';
+  s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
+  s.style.animationDelay=(Math.random()*3)+'s';$('#intro').appendChild(s)}
+
+/* tapping the envelope: open flap, zoom into the invitation, petals, start music */
+$('#env').onclick=()=>{
+  const e=$('#env');if(e.classList.contains('open'))return;
+  e.classList.add('open');
+  playSong(true);                                   /* try to start the music (tap allows it) */
+  setTimeout(()=>{$('#intro').classList.add('go');document.body.classList.remove('lock');$('#main').classList.add('show');petals()},1800);
+  setTimeout(()=>$('#intro').remove(),3200);
+};
+function petals(){
+  for(let i=0;i<22;i++)setTimeout(()=>{
+    const p=document.createElement('div');p.className='petal';
+    p.style.left=Math.random()*100+'vw';p.style.animationDuration=(6+Math.random()*6)+'s';
+    p.style.transform='scale('+(.6+Math.random())+')';
+    document.body.appendChild(p);setTimeout(()=>p.remove(),13000);
+  },i*350);
+}
+setInterval(()=>$('#main').classList.contains('show')&&petals(),9000);
+
+/* fade-up when scrolling */
+const io=new IntersectionObserver(es=>es.forEach(x=>x.isIntersecting&&x.target.classList.add('in')),{threshold:.15});
+$$('.rv').forEach(e=>io.observe(e));
+
+/* countdown */
+function tick(){
+  let d=Math.max(0,target-new Date()),s=Math.floor(d/1e3);
+  const v=[['Days',Math.floor(s/86400)],['Hours',Math.floor(s%86400/3600)],['Mins',Math.floor(s%3600/60)],['Secs',s%60]];
+  $('#count').innerHTML=v.map(a=>`<div><b>${a[1]}</b>${a[0]}</div>`).join('');
+}
+tick();setInterval(tick,1000);
+
+/* ---------- MUSIC PLAYER ---------- */
+const aud=$('#aud'),pl=$('#player'),N=56;
+const ICON_PLAY='<svg viewBox="0 0 40 40"><path d="M11 5l24 15-24 15z"/></svg>',
+      ICON_PAUSE='<svg viewBox="0 0 40 40"><rect x="8" y="6" width="9" height="28" rx="3"/><rect x="23" y="6" width="9" height="28" rx="3"/></svg>';
+let cur=0;
+$('#wave').innerHTML=Array.from({length:N},(_,i)=>{
+  const h=14+62*Math.abs(Math.sin(i*.42)*Math.cos(i*.11+1))+8*Math.abs(Math.sin(i*2.3));
+  return `<i style="height:${h}px;animation-delay:${(i%9)*.09}s"></i>`}).join('');
+$('#pp').innerHTML=ICON_PLAY;
+function drawList(){$('#plist').innerHTML=SONGS.map((s,i)=>`<p class="${i==cur?'on':''}" data-i="${i}">${i+1}. ${s.title}</p>`).join('')}
+$('#plist').onclick=e=>{const p=e.target.closest('p');if(p){cur=+p.dataset.i;playSong(true)}};
+function playSong(fresh){
+  if(!SONGS.length)return;
+  if(fresh||!aud.src){aud.src=SONGS[cur].src}
+  aud.play().then(()=>{},()=>{});                   /* ignore if file missing or browser blocks */
+  drawList();
+}
+function setUI(){
+  const on=!aud.paused;pl.classList.toggle('playing',on);
+  $('#pp').innerHTML=on?ICON_PAUSE:ICON_PLAY;
+  $('#lbl').textContent=on?'Now playing: '+SONGS[cur].title:'Click to play';
+}
+aud.addEventListener('play',setUI);aud.addEventListener('pause',setUI);
+aud.addEventListener('error',()=>{if(aud.src)$('#lbl').textContent='Add your song file to the songs folder'});
+aud.addEventListener('timeupdate',()=>{
+  const p=aud.duration?aud.currentTime/aud.duration:0;
+  $('#seek').value=p*100;
+  $$('#wave i').forEach((b,i)=>b.classList.toggle('done',i<p*N));
+});
+aud.addEventListener('ended',()=>go(1));
+$('#seek').oninput=e=>{if(aud.duration)aud.currentTime=e.target.value/100*aud.duration};
+$('#pp').onclick=()=>{ if(aud.paused){ if(!aud.src)aud.src=SONGS[cur].src; aud.play().catch(()=>{}) } else aud.pause() };
+function go(d){cur=(cur+d+SONGS.length)%SONGS.length;playSong(true)}
+$('#prev').onclick=()=>go(-1);$('#next').onclick=()=>go(1);
+drawList();
+
+/* ---------- RSVP ----------
+   Guests press Confirm -> the request goes to the Checkers page (checkers.html).
+   Only people the checker ACCEPTS appear here in the Attendees list. */
+const MAX=50;                       /* slots per side. Keep the same number in checkers.html */
+let data={groom:[],bride:[]},side=null,busy=false;
+Store.watchAttendees(list=>{        /* live list of ACCEPTED people only */
+  data={groom:list.filter(x=>x.side==='groom'),bride:list.filter(x=>x.side==='bride')};
+  refresh();if($('#m2').classList.contains('on'))lists();
+},e=>console.error(e));
+function refresh(){
+  const g=data.groom.length,b=data.bride.length,t=g+b;
+  $('#gl').textContent=MAX-g;$('#bl').textContent=MAX-b;
+  $$('.bar i').forEach(i=>i.style.width=(t/(MAX*2)*100)+'%');
+  /* the little blinking hint next to the count - change its words here */
+  $$('.cnt').forEach(c=>c.innerHTML=t+' of '+MAX*2+' attending <span class="hint">&middot; &#128064; See who\'s coming &rsaquo;</span>');
+}
+function lists(){
+  for(const [k,id] of [['groom','#lg'],['bride','#lb']])
+    $(id).innerHTML=Array.from({length:MAX},(_,i)=>{const n=data[k][i];
+      return n?`<p class="taken">${i+1}. ${n.name.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</p>`:`<p><em>${i+1}.</em></p>`}).join('');
+}
+const openM=id=>$(id).classList.add('on'),closeM=id=>$(id).classList.remove('on');
+$('#openRsvp').onclick=()=>{$('#ask').style.display='block';$('#more').classList.remove('on');$('#err').textContent='';openM('#m1')};
+$('#back1').onclick=()=>closeM('#m1');
+$('#yes').onclick=()=>{$('#ask').style.display='none';$('#more').classList.add('on')};
+$$('.side').forEach(s=>s.onclick=()=>{
+  $$('.side').forEach(x=>{x.classList.remove('sel');x.querySelector('.n').style.display='none'});
+  s.classList.add('sel');s.querySelector('.n').style.display='block';side=s.dataset.s;
+});
+$('#back2').onclick=()=>closeM('#m1');
+$$('.prog').forEach(p=>p.onclick=()=>{lists();openM('#m2')});
+$('#back3').onclick=()=>closeM('#m2');
+$('#confirm').onclick=async()=>{
+  if(busy)return;
+  const name=$('#nm').value.trim().replace(/\s+/g,' '),ph=$('#ph').value.trim(),err=$('#err');
+  if(!side)return err.textContent='Please choose Groom\'s or Bride\'s side.';
+  if(name.split(' ').length<2)return err.textContent='Please enter your name and surname.';
+  if(name.length>60)return err.textContent='That name is too long.';
+  if(ph&&(!/^[\d\s+\-()]+$/.test(ph)||ph.replace(/\D/g,'').length<9||ph.replace(/\D/g,'').length>15))return err.textContent='That phone number does not look right.';
+  if(data[side].length>=MAX)return err.textContent='Sorry, that side is full.';
+  busy=true;err.textContent='';$('#confirm').textContent='Sending...';
+  try{
+    await Store.submit({name,side,phone:ph});
+    $('#more').innerHTML='<h3 style="margin:10px 0">Thank you, '+name.replace(/</g,'')+'! &#10084;<br>Your reply has been sent to the family. Your name will show on the list once it has been approved.</h3><div class="row"><button class="btn" onclick="location.reload()">Close</button></div>';
+    petals();
+  }catch(e){console.error(e);err.textContent='Sorry, something went wrong. Please try again.';$('#confirm').textContent='Confirm'}
+  busy=false;
+};
+refresh();
+
+/* ---------- Sliding pictures ---------- */
+const car=$('#car');
+car.innerHTML=Array(4).fill(PHOTOS).flat().map(p=>`<div style="background-image:url('${p}')"></div>`).join('');
+let pos=0,paused=false,t;
+function setW(){return car.scrollWidth/4}
+function step(){
+  if(!paused){pos+=SLIDE_SPEED;if(pos>=setW())pos-=setW();car.scrollLeft=pos}
+  requestAnimationFrame(step);
+}
+function hold(){paused=true;clearTimeout(t)}
+function release(d){clearTimeout(t);t=setTimeout(()=>{pos=car.scrollLeft;if(pos>=setW())pos-=setW();paused=false},d)}
+car.addEventListener('touchstart',hold,{passive:true});
+car.addEventListener('touchend',()=>release(1800));
+car.addEventListener('mouseenter',hold);
+car.addEventListener('mouseleave',()=>release(300));
+car.addEventListener('wheel',()=>{hold();release(1800)},{passive:true});
+step();
+
+/* ---------- Rose nudge on scroll (roses stay in their corners, just wobble a little) ---------- */
+let lastY=scrollY,nv=0;
+addEventListener('scroll',()=>{nv=Math.max(-NUDGE,Math.min(NUDGE,nv+(scrollY-lastY)*.25));lastY=scrollY},{passive:true});
+(function settle(){nv*=.9;if(Math.abs(nv)<.05)nv=0;document.documentElement.style.setProperty('--nv',nv.toFixed(2)+'px');requestAnimationFrame(settle)})();
+
+/* ---------- Fading quotes ---------- */
+let qi=0;const qt=$('#qt');
+function showQ(){qt.textContent='\u201C'+Q[qi]+'\u201D';qt.classList.add('on');
+  setTimeout(()=>{qt.classList.remove('on');qi=(qi+1)%Q.length;setTimeout(showQ,1500)},4200)}
+showQ();
+</script>
+</body>
+</html>
